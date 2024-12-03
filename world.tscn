@@ -4,17 +4,18 @@
 [ext_resource type="Script" path="res://addons/zylann.hterrain/hterrain.gd" id="1_rneon"]
 [ext_resource type="Script" path="res://addons/zylann.hterrain/hterrain_texture_set.gd" id="2_1r314"]
 [ext_resource type="Resource" path="res://terrain/data.hterrain" id="2_bb71t"]
-[ext_resource type="Texture2D" uid="uid://dv5ae6ikek8u6" path="res://world_slot0_albedo_bump.png" id="4_bd23e"]
-[ext_resource type="Texture2D" uid="uid://c5yven1nig1pp" path="res://world_slot1_albedo_bump.png" id="5_clocn"]
-[ext_resource type="Texture2D" uid="uid://dbrcst8tdfvqp" path="res://world_slot2_albedo_bump.png" id="6_gsbxg"]
-[ext_resource type="Texture2D" uid="uid://hr6faq0jpbs4" path="res://world_slot0_normal_roughness.png" id="7_5rmkn"]
-[ext_resource type="Texture2D" uid="uid://l7fjmu0prtb" path="res://world_slot1_normal_roughness.png" id="8_g5lhm"]
-[ext_resource type="Texture2D" uid="uid://c4f34gl7qsrjv" path="res://world_slot2_normal_roughness.png" id="9_1p8ws"]
+[ext_resource type="Texture2D" uid="uid://dou1moxs874yj" path="res://world_slot0_albedo_bump.png" id="4_bd23e"]
+[ext_resource type="Texture2D" uid="uid://i5egrmjxrl24" path="res://world_slot0_normal_roughness.png" id="7_5rmkn"]
+[ext_resource type="Texture2D" uid="uid://0c4jpk8ooaf3" path="res://world_slot1_albedo_bump.png" id="8_f21qf"]
+[ext_resource type="Texture2D" uid="uid://ddprsn2m2me3i" path="res://world_slot2_albedo_bump.png" id="9_ybsf8"]
+[ext_resource type="Texture2D" uid="uid://cff32y3sfnrwt" path="res://world_slot1_normal_roughness.png" id="11_hrb3n"]
 [ext_resource type="Shader" uid="uid://bxthxpl7ttrgn" path="res://shader/acean_shader.res" id="12_dbgot"]
+[ext_resource type="Texture2D" uid="uid://4qjtkfpfpqj0" path="res://world_slot2_normal_roughness.png" id="12_wx1m3"]
 [ext_resource type="Script" path="res://scripts/day_night_cycle.gd" id="13_7xqce"]
 [ext_resource type="Script" path="res://scripts/player.gd" id="13_m41u2"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_if30n"]
+shading_mode = 0
 albedo_color = Color(0.901961, 0.129412, 0.172549, 1)
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_q8f3w"]
@@ -47,19 +48,19 @@ subdivide_depth = 2
 [sub_resource type="Resource" id="Resource_l583y"]
 script = ExtResource("2_1r314")
 mode = 0
-textures = [[ExtResource("4_bd23e"), ExtResource("5_clocn"), ExtResource("6_gsbxg")], [ExtResource("7_5rmkn"), ExtResource("8_g5lhm"), ExtResource("9_1p8ws")]]
+textures = [[ExtResource("4_bd23e"), ExtResource("8_f21qf"), ExtResource("9_ybsf8")], [ExtResource("7_5rmkn"), ExtResource("11_hrb3n"), ExtResource("12_wx1m3")]]
 
 [sub_resource type="Gradient" id="Gradient_b6e3i"]
-offsets = PackedFloat32Array(0.00874636, 0.176119, 0.38209, 0.552239, 0.701493, 0.886567, 1)
-colors = PackedColorArray(0.960784, 0.470588, 0.207843, 1, 0.977746, 0.597007, 0.203609, 1, 0.990464, 0.782858, 0.278213, 1, 0.941176, 0.952941, 0.54902, 1, 0.992157, 0.784314, 0.278431, 1, 0.976471, 0.596078, 0.203922, 1, 0.960463, 0.472254, 0.208066, 1)
+offsets = PackedFloat32Array(0.00874636, 0.17268, 0.311856, 0.466495, 0.587629, 0.757732, 0.853093, 1)
+colors = PackedColorArray(0.960784, 0.470588, 0.207843, 1, 0.977746, 0.597007, 0.203609, 1, 0.990464, 0.782858, 0.278213, 1, 0.890483, 0.861834, 0.997356, 1, 0.890196, 0.862745, 0.996078, 1, 0.992157, 0.784314, 0.278431, 1, 0.976471, 0.596078, 0.203922, 1, 0.960463, 0.472254, 0.208066, 1)
 
 [sub_resource type="Curve" id="Curve_ni588"]
 _data = [Vector2(0.141558, 0), 0.0, 0.0, 0, 0, Vector2(0.263636, 1), 0.0, 0.0, 0, 0, Vector2(0.687013, 1), 0.0, 0.0, 0, 0, Vector2(0.824675, 0), 0.0, 0.0, 0, 0]
 point_count = 4
 
 [sub_resource type="Gradient" id="Gradient_2ofdr"]
-offsets = PackedFloat32Array(0)
-colors = PackedColorArray(0.797741, 0.87113, 0.995169, 1)
+offsets = PackedFloat32Array(0, 0.529412, 0.964706)
+colors = PackedColorArray(0.797741, 0.87113, 0.995169, 1, 0.797741, 0.87113, 0.995169, 1, 0.307645, 0.54586, 0.96967, 1)
 
 [sub_resource type="Curve" id="Curve_303fj"]
 _data = [Vector2(0.00232558, 1), 0.0, 0.0, 0, 0, Vector2(0.253425, 0.0141265), 0.0, 0.0, 0, 0, Vector2(0.708219, 0), 0.0, 0.0, 0, 0, Vector2(1, 1), 0.0, 0.0, 0, 0]
@@ -101,14 +102,16 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 106.744, 0)
 transform = Transform3D(0.573576, 0, 0.819152, 0, 1, 0, -0.819152, 0, 0.573576, 0, 0, 0)
 script = ExtResource("1_dw7lj")
 target = NodePath("../player")
+metadata/_edit_group_ = true
 
 [node name="Camera" type="Camera3D" parent="camera_pivot"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 264.971, 0)
 
 [node name="player" type="CharacterBody3D" parent="." node_paths=PackedStringArray("view")]
-transform = Transform3D(3, 0, 0, 0, 3, 0, 0, 0, 3, 2092, 333, 0)
+transform = Transform3D(3, 0, 0, 0, 3, 0, 0, 0, 3, 169.262, 9.53656, -216.832)
 script = ExtResource("13_m41u2")
 view = NodePath("../camera_pivot")
+metadata/_edit_group_ = true
 
 [node name="p-mesh" type="MeshInstance3D" parent="player"]
 mesh = SubResource("CapsuleMesh_q8f3w")
@@ -119,7 +122,6 @@ skeleton = NodePath("../..")
 shape = SubResource("CapsuleShape3D_auec3")
 
 [node name="NavigationRegion3D" type="NavigationRegion3D" parent="."]
-transform = Transform3D(0.8, 0, 0, 0, 0.8, 0, 0, 0, 0.8, 0, 0, 0)
 navigation_mesh = SubResource("NavigationMesh_6itd1")
 
 [node name="ocean" type="MeshInstance3D" parent="."]
@@ -130,7 +132,7 @@ mesh = SubResource("PlaneMesh_aphpl")
 physics_interpolation_mode = 1
 script = ExtResource("1_rneon")
 ambient_wind = 0.3
-map_scale = Vector3(10, 10, 10)
+map_scale = Vector3(5, 10, 5)
 centered = true
 _terrain_data = ExtResource("2_bb71t")
 chunk_size = 16
@@ -151,7 +153,7 @@ shader_params/u_tile_reduction = null
 [node name="DayNightCycle" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 286.652, 0)
 script = ExtResource("13_7xqce")
-day_length = 3000.0
+day_length = 1500.0
 sun_color = SubResource("Gradient_b6e3i")
 sun_intensity = SubResource("Curve_ni588")
 moon_color = SubResource("Gradient_2ofdr")
@@ -172,6 +174,6 @@ sky_mode = 1
 
 [node name="Sun" type="DirectionalLight3D" parent="DayNightCycle"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 958.148, 0)
-light_color = Color(0.957441, 0.969386, 0.998447, 1)
+light_color = Color(0.844383, 0.839326, 0.958156, 1)
 light_bake_mode = 0
 shadow_enabled = true

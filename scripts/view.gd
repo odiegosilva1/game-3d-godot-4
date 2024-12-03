@@ -11,7 +11,7 @@ extends Node3D
 
 @export_group("Rotation")
 @export var rotation_speed = 120
-@export var min_rotation_x = -80
+@export var min_rotation_x = -90
 @export var max_rotation_x = -10
 
 var camera_rotation:Vector3
