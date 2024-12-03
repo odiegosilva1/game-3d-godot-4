@@ -1,0 +1,11 @@
+[gd_scene load_steps=3 format=3 uid="uid://bpqkbedo4ghb6"]
+
+[ext_resource type="PackedScene" uid="uid://nhkwlihlxh66" path="res://assets/retro_nature_pack/models/glTF/trees/tree01.glb" id="1_32501"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_uofg0"]
+
+[node name="tree012" instance=ExtResource("1_32501")]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="tree01" index="1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.518793, 0.001)
+shape = SubResource("CapsuleShape3D_uofg0")
