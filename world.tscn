@@ -177,3 +177,5 @@ light_energy = 4.0
 light_volumetric_fog_energy = 1.53
 light_bake_mode = 0
 shadow_enabled = true
+
+[node name="GridMap" type="GridMap" parent="."]
