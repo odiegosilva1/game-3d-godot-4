@@ -1,6 +1,6 @@
 extends CharacterBody3D
 
-const SPEED = 1500.0
+const SPEED = 500.0
 const JUMP_VELOCITY = 10.0
 
 @export var view : Node3D
