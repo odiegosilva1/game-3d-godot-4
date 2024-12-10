@@ -1,4 +1,4 @@
-[gd_scene load_steps=32 format=3 uid="uid://bqip0tt0gnf48"]
+[gd_scene load_steps=31 format=3 uid="uid://bqip0tt0gnf48"]
 
 [ext_resource type="Script" path="res://scripts/view.gd" id="1_dw7lj"]
 [ext_resource type="Script" path="res://addons/zylann.hterrain/hterrain.gd" id="1_rneon"]
@@ -16,7 +16,9 @@
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_if30n"]
 shading_mode = 0
-albedo_color = Color(0.901961, 0.129412, 0.172549, 1)
+albedo_color = Color(0.25098, 0.254902, 0.513726, 1)
+texture_repeat = false
+disable_receive_shadows = true
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_q8f3w"]
 material = SubResource("StandardMaterial3D_if30n")
@@ -24,12 +26,6 @@ material = SubResource("StandardMaterial3D_if30n")
 [sub_resource type="Skin" id="Skin_f3trn"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_auec3"]
-
-[sub_resource type="NavigationMesh" id="NavigationMesh_6itd1"]
-cell_size = 0.2
-cell_height = 0.1
-agent_radius = 0.8
-agent_max_climb = 0.4
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_g1adx"]
 render_priority = 0
@@ -59,8 +55,8 @@ _data = [Vector2(0.141558, 0), 0.0, 0.0, 0, 0, Vector2(0.263636, 1), 0.0, 0.0, 0
 point_count = 4
 
 [sub_resource type="Gradient" id="Gradient_2ofdr"]
-offsets = PackedFloat32Array(0, 0.529412, 0.964706)
-colors = PackedColorArray(0.797741, 0.87113, 0.995169, 1, 0.797741, 0.87113, 0.995169, 1, 0.307645, 0.54586, 0.96967, 1)
+offsets = PackedFloat32Array(0.0201342, 0.529412, 0.964706)
+colors = PackedColorArray(0.168627, 0.439216, 0.921569, 1, 0.797741, 0.87113, 0.995169, 1, 0.167822, 0.439004, 0.921939, 1)
 
 [sub_resource type="Curve" id="Curve_303fj"]
 _data = [Vector2(0.00232558, 1), 0.0, 0.0, 0, 0, Vector2(0.253425, 0.0141265), 0.0, 0.0, 0, 0, Vector2(0.708219, 0), 0.0, 0.0, 0, 0, Vector2(1, 1), 0.0, 0.0, 0, 0]
@@ -85,7 +81,6 @@ sky_material = SubResource("ProceduralSkyMaterial_mknot")
 
 [sub_resource type="Environment" id="Environment_14gcu"]
 background_mode = 2
-background_energy_multiplier = 1.4
 sky = SubResource("Sky_bkw2h")
 ambient_light_source = 3
 ambient_light_color = Color(0.0796062, 0.414363, 0.776562, 0.94902)
@@ -102,8 +97,11 @@ transform = Transform3D(0.5, 0, -0.866025, 0, 1, 0, 0.866025, 0, 0.5, 0, 0, 0)
 script = ExtResource("1_dw7lj")
 target = NodePath("../player")
 
+[node name="Camera" type="Camera3D" parent="camera_pivot"]
+transform = Transform3D(1, 0, 2.98023e-08, 0, 1, 0, -2.98023e-08, 0, 1, 0, 223.652, 0)
+
 [node name="player" type="CharacterBody3D" parent="." node_paths=PackedStringArray("view")]
-transform = Transform3D(3, 0, 0, 0, 3, 0, 0, 0, 3, 0, 105, 0)
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 14, 0)
 script = ExtResource("13_m41u2")
 view = NodePath("../camera_pivot")
 
@@ -115,19 +113,15 @@ skeleton = NodePath("../..")
 [node name="CollisionShape3D" type="CollisionShape3D" parent="player"]
 shape = SubResource("CapsuleShape3D_auec3")
 
-[node name="NavigationRegion3D" type="NavigationRegion3D" parent="."]
-navigation_mesh = SubResource("NavigationMesh_6itd1")
-
 [node name="ocean" type="MeshInstance3D" parent="."]
 transform = Transform3D(90, 0, 0, 0, 90, 0, 0, 0, 90, -95.8223, -243.706, -164.726)
 mesh = SubResource("PlaneMesh_aphpl")
 
 [node name="terrain" type="Node3D" parent="."]
 physics_interpolation_mode = 1
-transform = Transform3D(0.114937, 0, -0.993373, 0, 1, 0, 0.993373, 0, 0.114937, 0, 100, 0)
 script = ExtResource("1_rneon")
 ambient_wind = 0.3
-map_scale = Vector3(5, 20, 5)
+map_scale = Vector3(8, 8, 8)
 centered = true
 _terrain_data = ExtResource("2_bb71t")
 chunk_size = 16
@@ -148,7 +142,7 @@ shader_params/u_tile_reduction = null
 [node name="DayNightCycle" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 286.652, 0)
 script = ExtResource("13_7xqce")
-day_length = 1500.0
+day_length = 200.0
 sun_color = SubResource("Gradient_b6e3i")
 sun_intensity = SubResource("Curve_ni588")
 moon_color = SubResource("Gradient_2ofdr")
@@ -162,14 +156,12 @@ environment = SubResource("Environment_14gcu")
 
 [node name="Moon" type="DirectionalLight3D" parent="DayNightCycle"]
 transform = Transform3D(1, 0, 0, 0, 0.995239, 0.0974613, 0, -0.0974613, 0.995239, 0, 941.868, 0)
-light_energy = 0.5
 light_bake_mode = 0
 shadow_enabled = true
 sky_mode = 1
 
 [node name="Sun" type="DirectionalLight3D" parent="DayNightCycle"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 958.148, 0)
-light_color = Color(0.844383, 0.839326, 0.958156, 1)
 light_energy = 4.0
 light_volumetric_fog_energy = 1.53
 light_bake_mode = 0
