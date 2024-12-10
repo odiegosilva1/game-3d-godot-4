@@ -1,16 +1,7 @@
-[gd_scene load_steps=31 format=3 uid="uid://bqip0tt0gnf48"]
+[gd_scene load_steps=26 format=3 uid="uid://bqip0tt0gnf48"]
 
 [ext_resource type="Script" path="res://scripts/view.gd" id="1_dw7lj"]
-[ext_resource type="Script" path="res://addons/zylann.hterrain/hterrain.gd" id="1_rneon"]
-[ext_resource type="Script" path="res://addons/zylann.hterrain/hterrain_texture_set.gd" id="2_1r314"]
-[ext_resource type="Resource" path="res://terrain/data.hterrain" id="2_bb71t"]
-[ext_resource type="Texture2D" uid="uid://dou1moxs874yj" path="res://world_slot0_albedo_bump.png" id="4_bd23e"]
-[ext_resource type="Texture2D" uid="uid://i5egrmjxrl24" path="res://world_slot0_normal_roughness.png" id="7_5rmkn"]
-[ext_resource type="Texture2D" uid="uid://0c4jpk8ooaf3" path="res://world_slot1_albedo_bump.png" id="8_f21qf"]
-[ext_resource type="Texture2D" uid="uid://ddprsn2m2me3i" path="res://world_slot2_albedo_bump.png" id="9_ybsf8"]
-[ext_resource type="Texture2D" uid="uid://cff32y3sfnrwt" path="res://world_slot1_normal_roughness.png" id="11_hrb3n"]
 [ext_resource type="Shader" uid="uid://bxthxpl7ttrgn" path="res://shader/acean_shader.res" id="12_dbgot"]
-[ext_resource type="Texture2D" uid="uid://4qjtkfpfpqj0" path="res://world_slot2_normal_roughness.png" id="12_wx1m3"]
 [ext_resource type="Script" path="res://scripts/day_night_cycle.gd" id="13_7xqce"]
 [ext_resource type="Script" path="res://scripts/player.gd" id="13_m41u2"]
 
@@ -27,6 +18,8 @@ material = SubResource("StandardMaterial3D_if30n")
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_auec3"]
 
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_ukuuf"]
+
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_g1adx"]
 render_priority = 0
 shader = ExtResource("12_dbgot")
@@ -40,11 +33,6 @@ material = SubResource("ShaderMaterial_g1adx")
 size = Vector2(2000, 2000)
 subdivide_width = 20
 subdivide_depth = 2
-
-[sub_resource type="Resource" id="Resource_l583y"]
-script = ExtResource("2_1r314")
-mode = 0
-textures = [[ExtResource("4_bd23e"), ExtResource("8_f21qf"), ExtResource("9_ybsf8")], [ExtResource("7_5rmkn"), ExtResource("11_hrb3n"), ExtResource("12_wx1m3")]]
 
 [sub_resource type="Gradient" id="Gradient_b6e3i"]
 offsets = PackedFloat32Array(0.00874636, 0.17268, 0.311856, 0.466495, 0.587629, 0.757732, 0.853093, 1)
@@ -90,7 +78,20 @@ ssil_enabled = true
 fog_mode = 1
 fog_density = 1.0
 
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_rlfxh"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_wgct7"]
+size = Vector3(10, 0.2, 10)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_3vhxh"]
+albedo_color = Color(0.0745098, 0.341176, 0.113725, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_qs8op"]
+material = SubResource("StandardMaterial3D_3vhxh")
+size = Vector3(10, 0.2, 10)
+
 [node name="world" type="Node3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.73366, 0, 0)
 
 [node name="camera_pivot" type="Node3D" parent="." node_paths=PackedStringArray("target")]
 transform = Transform3D(0.5, 0, -0.866025, 0, 1, 0, 0.866025, 0, 0.5, 0, 0, 0)
@@ -101,7 +102,7 @@ target = NodePath("../player")
 transform = Transform3D(1, 0, 2.98023e-08, 0, 1, 0, -2.98023e-08, 0, 1, 0, 223.652, 0)
 
 [node name="player" type="CharacterBody3D" parent="." node_paths=PackedStringArray("view")]
-transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 14, 0)
+transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, 0, 2.41701, 0)
 script = ExtResource("13_m41u2")
 view = NodePath("../camera_pivot")
 
@@ -113,31 +114,17 @@ skeleton = NodePath("../..")
 [node name="CollisionShape3D" type="CollisionShape3D" parent="player"]
 shape = SubResource("CapsuleShape3D_auec3")
 
-[node name="ocean" type="MeshInstance3D" parent="."]
-transform = Transform3D(90, 0, 0, 0, 90, 0, 0, 0, 90, -95.8223, -243.706, -164.726)
-mesh = SubResource("PlaneMesh_aphpl")
+[node name="MeshInstance3D" type="MeshInstance3D" parent="player"]
+transform = Transform3D(0.0107419, 0.299808, 0, -0.299808, 0.0107419, 0, 0, 0, 0.3, 0.299292, 0.405891, 0.149733)
+mesh = SubResource("CapsuleMesh_ukuuf")
 
-[node name="terrain" type="Node3D" parent="."]
-physics_interpolation_mode = 1
-script = ExtResource("1_rneon")
-ambient_wind = 0.3
-map_scale = Vector3(8, 8, 8)
-centered = true
-_terrain_data = ExtResource("2_bb71t")
-chunk_size = 16
-collision_enabled = true
-collision_layer = 255
-collision_mask = 255
-shader_type = "Classic4Lite"
-custom_shader = null
-custom_globalmap_shader = null
-texture_set = SubResource("Resource_l583y")
-render_layers = 1
-cast_shadow = 1
-shader_params/u_ground_uv_scale = 20
-shader_params/u_depth_blending = true
-shader_params/u_triplanar = null
-shader_params/u_tile_reduction = null
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="player"]
+transform = Transform3D(0.0107419, 0.299808, 0, -0.299808, 0.0107419, 0, 0, 0, 0.3, 0.299292, 0.405891, -0.19258)
+mesh = SubResource("CapsuleMesh_ukuuf")
+
+[node name="ocean" type="MeshInstance3D" parent="."]
+transform = Transform3D(90, 0, 0, 0, 90, 0, 0, 0, 90, -95.8223, -55.5083, -164.726)
+mesh = SubResource("PlaneMesh_aphpl")
 
 [node name="DayNightCycle" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 286.652, 0)
@@ -167,4 +154,12 @@ light_volumetric_fog_energy = 1.53
 light_bake_mode = 0
 shadow_enabled = true
 
-[node name="GridMap" type="GridMap" parent="."]
+[node name="StaticBody3D" type="StaticBody3D" parent="."]
+physics_material_override = SubResource("PhysicsMaterial_rlfxh")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D"]
+transform = Transform3D(10, 0, 0, 0, 10, 0, 0, 0, 10, 0, 0, 0)
+shape = SubResource("BoxShape3D_wgct7")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="StaticBody3D/CollisionShape3D"]
+mesh = SubResource("BoxMesh_qs8op")
