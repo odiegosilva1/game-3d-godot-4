@@ -11,15 +11,29 @@ material = SubResource("StandardMaterial3D_oxob8")
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_pwf7m"]
 
 [node name="Player" type="CharacterBody3D"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.99268, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.99268, 0)
 wall_min_slide_angle = 0.0
 floor_stop_on_slope = false
 floor_block_on_wall = false
 script = ExtResource("1_nxd3g")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
-transform = Transform3D(3, 0, 0, 0, 3, 0, 0, 0, 3, 0, 0, 0)
+transform = Transform3D(15, 0, 0, 0, 15, 0, 0, 0, 15, 0, 13.5238, 0)
 mesh = SubResource("CapsuleMesh_cciqq")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(15, 0, 0, 0, 15, 0, 0, 0, 15, 0, 12.8913, 0)
 shape = SubResource("CapsuleShape3D_pwf7m")
+
+[node name="camera" type="Node3D" parent="."]
+
+[node name="horizontal" type="Node3D" parent="camera"]
+
+[node name="vertical" type="Node3D" parent="camera/horizontal"]
+
+[node name="spring-arm" type="SpringArm3D" parent="camera/horizontal/vertical"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 93.0465, 34.4023, 0)
+spring_length = 3.0
+
+[node name="Camera3D" type="Camera3D" parent="camera/horizontal/vertical/spring-arm"]
+transform = Transform3D(0.054985, 0, 0.998487, 0, 1, 0, -0.998487, 0, 0.054985, 0, 0, 0)

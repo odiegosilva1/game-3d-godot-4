@@ -183,16 +183,11 @@ void sky() {
 
 	// Sky color
 
-	vec3 sky_gradient = mix(bottom_color.rgb, top_color.rgb, clamp(EYEDIR.y, 0.0, 1.0));
-	vec3 sunset_color = sun_scatter * (1.0 - horizon_mask);
-	vec3 sky_color = clamp(sky_gradient + sunset_color, 0.0, 1.0);
+
 
 	// Stars
 
-	if(stars_intensity > 0.0){
-		vec2 stars = voronoi(EYEDIR * 25.0).xz;
-		sky_color += smoothstep(0.025 + ((1.0 + sin(TIME + stars.y)) / 2.0) * 0.05, 0.0, stars.x) * stars_intensity;
-	}
+
 
 	// Add shooting stars
 
