@@ -1,0 +1,25 @@
+[gd_scene load_steps=5 format=3 uid="uid://d2lxdbdtqjlh3"]
+
+[ext_resource type="Script" path="res://scripts/player_node.gd" id="1_nxd3g"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_oxob8"]
+albedo_color = Color(0.854902, 0.0392157, 0.133333, 1)
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_cciqq"]
+material = SubResource("StandardMaterial3D_oxob8")
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_pwf7m"]
+
+[node name="Player" type="CharacterBody3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.99268, 0)
+wall_min_slide_angle = 0.0
+floor_stop_on_slope = false
+floor_block_on_wall = false
+script = ExtResource("1_nxd3g")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(3, 0, 0, 0, 3, 0, 0, 0, 3, 0, 0, 0)
+mesh = SubResource("CapsuleMesh_cciqq")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("CapsuleShape3D_pwf7m")

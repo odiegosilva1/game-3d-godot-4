@@ -2,7 +2,7 @@
 
 [ext_resource type="Texture2D" uid="uid://uh3iyau3svql" path="res://assets/Sun.png" id="1_cdgwy"]
 
-[sub_resource type="Shader" id="Shader_7wwgc"]
+[sub_resource type="Shader" id="Shader_1hrde"]
 code = "shader_type sky;
 render_mode use_half_res_pass;
 
@@ -234,7 +234,7 @@ void sky() {
 _data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(0.159751, 1), 0.0, 0.0, 0, 0, Vector2(0.392116, 0.290566), 0.0, 0.0, 0, 0, Vector2(0.711618, 0.864151), 0.0, 0.0, 0, 0, Vector2(1, 0.743396), 0.0, 0.0, 0, 0]
 point_count = 5
 
-[sub_resource type="CurveTexture" id="CurveTexture_whtu7"]
+[sub_resource type="CurveTexture" id="CurveTexture_hvka3"]
 curve = SubResource("Curve_ph74e")
 
 [sub_resource type="Gradient" id="Gradient_ryi74"]
@@ -245,7 +245,7 @@ fractal_octaves = 8
 domain_warp_type = 1
 domain_warp_fractal_type = 2
 
-[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_gx4rh"]
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_pphl8"]
 seamless = true
 color_ramp = SubResource("Gradient_ryi74")
 noise = SubResource("FastNoiseLite_bkc3f")
@@ -260,14 +260,14 @@ fractal_octaves = 8
 domain_warp_type = 1
 domain_warp_fractal_type = 2
 
-[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_ovny4"]
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_8ylfo"]
 in_3d_space = true
 seamless = true
 color_ramp = SubResource("Gradient_n8gnm")
 noise = SubResource("FastNoiseLite_y14y3")
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_4u2xx"]
-shader = SubResource("Shader_7wwgc")
+shader = SubResource("Shader_1hrde")
 shader_parameter/clouds_samples = 32
 shader_parameter/shadow_sample = 4
 shader_parameter/clouds_density = 0.5
@@ -275,11 +275,11 @@ shader_parameter/clouds_scale = 1.0
 shader_parameter/clouds_smoothness = 0.035
 shader_parameter/clouds_light_color = Color(1, 1, 1, 1)
 shader_parameter/clouds_shadow_intensity = 1.0
-shader_parameter/cloud_shape_sampler = SubResource("NoiseTexture2D_ovny4")
-shader_parameter/cloud_noise_sampler = SubResource("NoiseTexture2D_gx4rh")
-shader_parameter/cloud_curves = SubResource("CurveTexture_whtu7")
+shader_parameter/cloud_shape_sampler = SubResource("NoiseTexture2D_8ylfo")
+shader_parameter/cloud_noise_sampler = SubResource("NoiseTexture2D_pphl8")
+shader_parameter/cloud_curves = SubResource("CurveTexture_hvka3")
 shader_parameter/high_clouds_density = 0.4
-shader_parameter/high_clouds_sampler = SubResource("NoiseTexture2D_ovny4")
+shader_parameter/high_clouds_sampler = SubResource("NoiseTexture2D_8ylfo")
 shader_parameter/top_color = Color(0.34902, 0.588235, 1, 1)
 shader_parameter/bottom_color = Color(0, 0.329412, 0.968627, 1)
 shader_parameter/sun_scatter = Color(0.298039, 0.298039, 0.298039, 1)
@@ -291,13 +291,13 @@ shader_parameter/stars_intensity = 0.0
 shader_parameter/shooting_stars_intensity = 0.0
 shader_parameter/shooting_star_tint = null
 
-[sub_resource type="Sky" id="Sky_s3rxv"]
+[sub_resource type="Sky" id="Sky_xxnq6"]
 sky_material = SubResource("ShaderMaterial_4u2xx")
 
 [sub_resource type="Environment" id="Environment_ywyjx"]
 background_mode = 2
 background_energy_multiplier = 1.5
-sky = SubResource("Sky_s3rxv")
+sky = SubResource("Sky_xxnq6")
 volumetric_fog_density = 10.0
 adjustment_enabled = true
 adjustment_saturation = 1.5
@@ -310,4 +310,5 @@ environment = SubResource("Environment_ywyjx")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="WorldEnvironment"]
 transform = Transform3D(1, 0, 0, 0, 0.739678, 0.672961, 0, -0.672961, 0.739678, 0, 2.62658, 0)
-light_color = Color(2.11775e-06, 0.690668, 0.693964, 1)
+light_color = Color(1, 1, 0.85098, 1)
+light_volumetric_fog_energy = 1.8

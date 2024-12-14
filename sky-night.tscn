@@ -1,6 +1,13 @@
-[gd_scene load_steps=18 format=3 uid="uid://bopq35sxqujcs"]
+[gd_scene load_steps=26 format=3 uid="uid://dosuodud8tjgp"]
 
 [ext_resource type="Texture2D" uid="uid://dmtji2jt5s2ud" path="res://assets/shooting_star_sampler.png" id="1_wwrfa"]
+[ext_resource type="Script" path="res://addons/zylann.hterrain/hterrain.gd" id="2_tgxne"]
+[ext_resource type="Resource" path="res://data.hterrain" id="3_ffu16"]
+[ext_resource type="Script" path="res://addons/zylann.hterrain/hterrain_texture_set.gd" id="4_qhhk0"]
+[ext_resource type="Texture2D" uid="uid://c04c4a1rtk55n" path="res://scenes/main_slot0_albedo_bump.png" id="5_fnrp3"]
+[ext_resource type="Texture2D" uid="uid://dsb835ks17fnj" path="res://scenes/main_slot1_albedo_bump.png" id="6_obd3b"]
+[ext_resource type="Texture2D" uid="uid://bk1kxmk2rduqy" path="res://scenes/main_slot0_normal_roughness.png" id="7_abmex"]
+[ext_resource type="Texture2D" uid="uid://k1dpqm2342lu" path="res://scenes/main_slot1_normal_roughness.png" id="8_t5frk"]
 
 [sub_resource type="Shader" id="Shader_ijqbf"]
 code = "shader_type sky;
@@ -306,9 +313,9 @@ shader_parameter/astro_tint = Color(0.936954, 0.884666, 0.968659, 1)
 shader_parameter/astro_scale = 3.0
 shader_parameter/astro_intensity = 3.0
 shader_parameter/astro_sampler = SubResource("CompressedTexture2D_mmyjg")
-shader_parameter/stars_intensity = 5.0
-shader_parameter/shooting_stars_intensity = 1.8
-shader_parameter/shooting_star_tint = Color(1, 0.747821, 0.574579, 1)
+shader_parameter/stars_intensity = 3.0
+shader_parameter/shooting_stars_intensity = 0.1
+shader_parameter/shooting_star_tint = Color(1, 1, 1, 1)
 shader_parameter/shooting_star_sampler = ExtResource("1_wwrfa")
 
 [sub_resource type="Sky" id="Sky_as3rg"]
@@ -322,6 +329,11 @@ volumetric_fog_density = 10.0
 adjustment_enabled = true
 adjustment_saturation = 1.5
 
+[sub_resource type="Resource" id="Resource_o18ob"]
+script = ExtResource("4_qhhk0")
+mode = 0
+textures = [[ExtResource("5_fnrp3"), ExtResource("6_obd3b")], [ExtResource("7_abmex"), ExtResource("8_t5frk")]]
+
 [node name="Nigth" type="Node3D"]
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
@@ -330,3 +342,26 @@ environment = SubResource("Environment_rpfyx")
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="WorldEnvironment"]
 transform = Transform3D(1, 0, 0, 0, 0.739678, 0.672961, 0, -0.672961, 0.739678, 0, 2.62658, 0)
 light_color = Color(2.11775e-06, 0.690668, 0.693964, 1)
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 151.006, 0)
+
+[node name="HTerrain" type="Node3D" parent="."]
+script = ExtResource("2_tgxne")
+map_scale = Vector3(5, 2.5, 5)
+centered = true
+_terrain_data = ExtResource("3_ffu16")
+chunk_size = 32
+collision_enabled = true
+collision_layer = 1
+collision_mask = 1
+shader_type = "Classic4Lite"
+custom_shader = null
+custom_globalmap_shader = null
+texture_set = SubResource("Resource_o18ob")
+render_layers = 1
+cast_shadow = 1
+shader_params/u_ground_uv_scale = 20
+shader_params/u_depth_blending = true
+shader_params/u_triplanar = null
+shader_params/u_tile_reduction = null

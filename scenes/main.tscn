@@ -1,7 +1,45 @@
-[gd_scene load_steps=2 format=3 uid="uid://dopxcek4dlwg1"]
+[gd_scene load_steps=9 format=3 uid="uid://dopxcek4dlwg1"]
 
 [ext_resource type="PackedScene" uid="uid://d0fqolpuei7ia" path="res://scenes/sky-day.tscn" id="1_uo6ob"]
+[ext_resource type="Script" path="res://addons/zylann.hterrain/hterrain.gd" id="2_68m1o"]
+[ext_resource type="Resource" path="res://terrain/data.hterrain" id="3_6oxav"]
+[ext_resource type="Script" path="res://addons/zylann.hterrain/hterrain_texture_set.gd" id="4_2hluc"]
+[ext_resource type="Texture2D" uid="uid://bglfg8gnjus1q" path="res://scenes/main_slot0_albedo_bump.png" id="5_4tdex"]
+[ext_resource type="PackedScene" uid="uid://d2lxdbdtqjlh3" path="res://scenes/player_node.tscn" id="7_3i5xk"]
+[ext_resource type="Texture2D" uid="uid://cxiut13baqqng" path="res://scenes/main_slot0_normal_roughness.png" id="7_ejsh0"]
+
+[sub_resource type="Resource" id="Resource_x31vx"]
+script = ExtResource("4_2hluc")
+mode = 0
+textures = [[ExtResource("5_4tdex")], [ExtResource("7_ejsh0")]]
 
 [node name="main" type="Node3D"]
 
 [node name="sky-material" parent="." instance=ExtResource("1_uo6ob")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 192.175, 0)
+
+[node name="HTerrain" type="Node3D" parent="."]
+script = ExtResource("2_68m1o")
+map_scale = Vector3(10, 2.5, 10)
+centered = true
+_terrain_data = ExtResource("3_6oxav")
+chunk_size = 32
+collision_enabled = true
+collision_layer = 1
+collision_mask = 1
+shader_type = "Classic4Lite"
+custom_shader = null
+custom_globalmap_shader = null
+texture_set = SubResource("Resource_x31vx")
+render_layers = 1
+cast_shadow = 1
+shader_params/u_ground_uv_scale = 20
+shader_params/u_depth_blending = true
+shader_params/u_triplanar = null
+shader_params/u_tile_reduction = null
+
+[node name="Player" parent="." instance=ExtResource("7_3i5xk")]
+transform = Transform3D(10, 0, 0, 0, 10, 0, 0, 0, 10, 0, 76.791, -505)
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 30.7908, 359.146, 0)
