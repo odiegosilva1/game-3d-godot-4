@@ -1,0 +1,367 @@
+[gd_scene load_steps=26 format=3 uid="uid://bopq35sxqujcs"]
+
+[ext_resource type="Texture2D" uid="uid://dmtji2jt5s2ud" path="res://assets/shooting_star_sampler.png" id="1_wwrfa"]
+[ext_resource type="Script" path="res://addons/zylann.hterrain/hterrain.gd" id="2_tgxne"]
+[ext_resource type="Resource" path="res://data.hterrain" id="3_ffu16"]
+[ext_resource type="Script" path="res://addons/zylann.hterrain/hterrain_texture_set.gd" id="4_qhhk0"]
+[ext_resource type="Texture2D" uid="uid://c04c4a1rtk55n" path="res://scenes/main_slot0_albedo_bump.png" id="5_fnrp3"]
+[ext_resource type="Texture2D" uid="uid://dsb835ks17fnj" path="res://scenes/main_slot1_albedo_bump.png" id="6_obd3b"]
+[ext_resource type="Texture2D" uid="uid://bk1kxmk2rduqy" path="res://scenes/main_slot0_normal_roughness.png" id="7_abmex"]
+[ext_resource type="Texture2D" uid="uid://k1dpqm2342lu" path="res://scenes/main_slot1_normal_roughness.png" id="8_t5frk"]
+
+[sub_resource type="Shader" id="Shader_ijqbf"]
+code = "shader_type sky;
+render_mode use_half_res_pass;
+
+group_uniforms clouds;
+
+uniform sampler2D cloud_shape_sampler : filter_linear_mipmap_anisotropic, repeat_enable;
+uniform sampler2D cloud_noise_sampler : filter_linear_mipmap_anisotropic, repeat_enable;
+uniform sampler2D cloud_curves;
+
+uniform int clouds_samples : hint_range(8, 32, 8) = 16;
+uniform int shadow_sample : hint_range(1, 4, 1) = 4;
+
+uniform float clouds_density : hint_range(0.0, 1.0, 0.1) = 0.5;
+uniform float clouds_scale : hint_range(0.5, 1.5, 0.1) = 1.0;
+uniform float clouds_smoothness : hint_range(0.01, 0.1, 0.01) = 0.035;
+uniform vec3 clouds_light_color : source_color;
+uniform float clouds_shadow_intensity : hint_range(0.1, 10.0, 0.1) = 1.0;
+
+group_uniforms high_clouds;
+
+uniform sampler2D high_clouds_sampler;
+uniform float high_clouds_density : hint_range(0.0, 1.0, 0.05) = 0.0;
+
+group_uniforms sky;
+
+uniform vec3 top_color : source_color = vec3(1.0);
+uniform vec3 bottom_color : source_color = vec3(1.0);
+uniform vec3 sun_scatter : source_color = vec3(1.0);
+
+group_uniforms astro;
+
+uniform vec3 astro_tint : source_color;
+uniform sampler2D astro_sampler : repeat_disable, filter_linear_mipmap;
+uniform float astro_scale : hint_range(0.1, 10.0, 0.1) = 1.0;
+uniform float astro_intensity : hint_range(1.0, 3.0, 0.1) = 1.0;
+
+group_uniforms stars;
+
+uniform float stars_intensity : hint_range(0.0, 5.0, 0.1) = 0.0;
+
+group_uniforms shooting_stars;
+
+uniform float shooting_stars_intensity : hint_range(0.0, 10.0, 0.1) = 0.0;
+uniform sampler2D shooting_star_sampler : filter_linear, repeat_disable;
+uniform vec3 shooting_star_tint : source_color;
+
+float rand(float n){return fract(sin(n) * 43758.5453123);}
+
+// Voronoi method credit:
+// The MIT License
+// Copyright © 2013 Inigo Quilez
+// https://www.shadertoy.com/view/ldl3Dl
+
+vec3 hash( vec3 x ){
+	x = vec3( dot(x,vec3(127.1,311.7, 74.7)),
+			  dot(x,vec3(269.5,183.3,246.1)),
+			  dot(x,vec3(113.5,271.9,124.6)));
+	return fract(sin(x)*43758.5453123);
+}
+
+vec3 voronoi( in vec3 x ){
+	vec3 p = floor( x );
+	vec3 f = fract( x );
+	
+	float id = 0.0;
+	vec2 res = vec2( 100.0 );
+	for( int k=-1; k<=1; k++ )
+	for( int j=-1; j<=1; j++ )
+	for( int i=-1; i<=1; i++ ) {
+		vec3 b = vec3( float(i), float(j), float(k) );
+		vec3 r = vec3( b ) - f + hash( p + b );
+		float d = dot( r, r );
+		if( d < res.x ) {
+			id = dot( p+b, vec3(1.0,57.0,113.0 ) );
+			res = vec2( d, res.x );
+		} else if( d < res.y ) {
+			res.y = d;
+		}
+    }
+    return vec3( sqrt( res ), abs(id) );
+}
+
+// https://stackoverflow.com/questions/18558910/direction-vector-to-rotation-matrix
+
+mat3 direction_to_matrix(vec3 direction) {
+	vec3 x_axis = normalize(cross(vec3(0.0, 1.0, 0.0), direction));
+	vec3 y_axis = normalize(cross(direction, x_axis));
+	return mat3(vec3(x_axis.x, y_axis.x, direction.x),
+				vec3(x_axis.y, y_axis.y, direction.y),
+				vec3(x_axis.z, y_axis.z, direction.z));
+}
+
+float cloud_density(vec3 p, float progress){
+	float t_o = TIME * 0.001;
+	float t_o_small = TIME * -0.005;
+	float noise = texture(cloud_noise_sampler, p.xy * 4.0 + t_o_small).x * 0.1 + 0.9;
+	float clouds_shape = texture(cloud_shape_sampler, (p.xy + t_o) * clouds_scale).x;
+	float height_curve = texture(cloud_curves, vec2(progress, 0.0)).x;
+	float base_density = 1.0 - clouds_density;
+	float density = 
+	smoothstep(base_density - clouds_smoothness,
+	base_density + clouds_smoothness,
+	clouds_shape * noise * height_curve
+	);
+	return density;
+}
+
+vec2 cloud_ray_march(vec3 direction, vec3 sun_direction){
+	
+	float density = 0.0;
+	float light = 0.0;
+	
+	float height = 0.03;
+	vec3 sample_point = vec3(0.0, 0.0, 2.0);
+	
+	int loop_offset = clouds_samples * 3;
+	
+	for(int i = loop_offset; i < clouds_samples + loop_offset; i++) {
+		float progress = float(i) / float(clouds_samples);
+		sample_point = direction * height * progress;
+		float point_density = cloud_density(sample_point, progress);
+		density += point_density;
+		
+		float point_light = 0.0;
+		for(int f = 0; f < shadow_sample; f++){
+			float shadow_progress = float(f) / float(shadow_sample);
+			vec3 shadow_offset = sun_direction * height * shadow_progress;
+			point_light += cloud_density(sample_point + shadow_offset, progress);
+		}
+		light += point_light;
+	}
+	return vec2(clamp(density, 0.0, 1.0), light / float(shadow_sample * clouds_samples));
+}
+
+vec3 random_direction(float seed){
+	float phi = rand(seed) * PI;
+	float costheta = rand(seed + 100.0) * 2.0 - 1.0;
+	float theta = acos(costheta);
+	return vec3( sin(theta) * cos(phi), (theta) * sin(phi), cos(theta) );
+}
+
+float get_shooting_star(vec3 eyedir){
+	float shooting_star = 0.0;
+	for(int i = 0; i < 4; i++){
+		float base_rand = rand(float(i));
+		float time = TIME + base_rand * 2.0;
+		float duration = 0.5 + base_rand;
+		float seed = floor(time / duration) * duration + base_rand;
+		float progress = mod(time, duration) / duration;
+		float rand_value = rand(seed + 100.0);
+		float rand_scale = base_rand * 10.0;
+		float a = rand_value * 0.8;
+		mat3 angle = mat3(vec3(cos(a), -sin(a), 0.0), vec3(sin(a), cos(a), 0.0), vec3(0.0, 0.0, 1.0));
+		vec3 shooting_dir = direction_to_matrix(random_direction(seed)) * angle * eyedir;
+		vec2 shooting_uv = ((shooting_dir.xy + vec2(0.0, progress * 0.4)) * (8.0 + rand_scale)) + vec2(0.5);
+
+		float shooting_mask = ceil(
+			clamp(shooting_uv.x * (1.0 - shooting_uv.x), 0.0, 1.0) *
+			clamp(shooting_uv.y * (1.0 - shooting_uv.y), 0.0, 1.0)
+			) * ceil(shooting_dir.z);
+			
+		shooting_star = clamp(
+			shooting_star + texture(shooting_star_sampler, shooting_uv).x
+			* sin(progress * PI)
+			* shooting_mask * rand_value,
+		0.0, 1.0);
+	}
+	return clamp(shooting_star, 0.0, 1.0);
+}
+
+void sky() {
+	
+	float horizon_mask = abs(EYEDIR.y);
+	float bottom_mask = smoothstep(0.5, 0.45, SKY_COORDS.y);
+	
+	vec3 dir = direction_to_matrix(LIGHT0_DIRECTION) * EYEDIR;
+	vec2 astro_uv = (-(dir.xy / dir.z) * astro_scale) + vec2(0.5);
+	float astro_mask = ceil(
+		clamp(astro_uv.x * (1.0 - astro_uv.x), 0.0, 1.0) *
+		clamp(astro_uv.y * (1.0 - astro_uv.y), 0.0, 1.0)
+		) * ceil(dir.z);
+	vec4 astro_color = texture(astro_sampler, astro_uv);
+	
+	// Sky color
+	
+	vec3 sky_gradient = mix(bottom_color.rgb, top_color.rgb, clamp(EYEDIR.y, 0.0, 1.0));
+	vec3 sunset_color = sun_scatter * (1.0 - horizon_mask);
+	vec3 sky_color = clamp(sky_gradient + sunset_color, 0.0, 1.0);
+	
+	// Stars
+	
+	if(stars_intensity > 0.0){
+		vec2 stars = voronoi(EYEDIR * 25.0).xz;
+		sky_color += smoothstep(0.025 + ((1.0 + sin(TIME + stars.y)) / 2.0) * 0.05, 0.0, stars.x) * stars_intensity;
+	}
+	
+	// Add shooting stars
+	
+	if(shooting_stars_intensity > 0.0){
+		sky_color += get_shooting_star(EYEDIR) * shooting_stars_intensity * shooting_star_tint;
+	}
+	
+	// Add astro
+	
+	sky_color = mix(sky_color, astro_color.rgb * astro_intensity * astro_tint, astro_color.a * astro_mask * bottom_mask);
+	
+	// Add high clouds
+	
+	if(high_clouds_density > 0.0){
+		vec2 high_clouds_uv = (EYEDIR.xz / clamp(EYEDIR.y, 0.0, 1.0)) * 0.25 + TIME * 0.001;
+		float high_clouds_mask = texture(high_clouds_sampler, high_clouds_uv).x;
+		sky_color = mix(sky_color, clouds_light_color, smoothstep(0.0, 1.0, high_clouds_mask) * horizon_mask * bottom_mask * high_clouds_density);
+	}
+	
+	// clouds
+	if (AT_HALF_RES_PASS) {
+		vec3 clouds_direction = vec3(EYEDIR.xz / clamp(EYEDIR.y, 0.0, 1.0), 1.0);
+		vec2 clouds = EYEDIR.y > 0.0 ? cloud_ray_march(clouds_direction, LIGHT0_DIRECTION) : vec2(0.0);
+		
+		COLOR = mix(bottom_color, clouds_light_color, exp(-clouds.y * clouds_shadow_intensity));
+		ALPHA = (1.0 - exp(-clouds.x * horizon_mask * bottom_mask * 10.0));
+		
+	}else{
+		COLOR.rgb = mix(sky_color, HALF_RES_COLOR.rgb, HALF_RES_COLOR.a);
+	}
+}"
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_mmyjg"]
+load_path = "res://.godot/imported/Sun.png-5941e28eb3bd314b06fb20408a487e29.s3tc.ctex"
+
+[sub_resource type="Curve" id="Curve_pjkls"]
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(0.159751, 1), 0.0, 0.0, 0, 0, Vector2(1, 0.743396), 0.0, 0.0, 0, 0]
+point_count = 3
+
+[sub_resource type="CurveTexture" id="CurveTexture_1gg2c"]
+curve = SubResource("Curve_pjkls")
+
+[sub_resource type="Gradient" id="Gradient_ewwsw"]
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_t0g8b"]
+noise_type = 2
+fractal_octaves = 8
+domain_warp_type = 1
+domain_warp_fractal_type = 2
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_nbupj"]
+seamless = true
+color_ramp = SubResource("Gradient_ewwsw")
+noise = SubResource("FastNoiseLite_t0g8b")
+
+[sub_resource type="Gradient" id="Gradient_n0apb"]
+offsets = PackedFloat32Array(0.112613, 0.536036, 1)
+colors = PackedColorArray(0, 0, 0, 1, 0.477157, 0.477157, 0.477157, 1, 1, 1, 1, 1)
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_yhtrg"]
+noise_type = 2
+fractal_octaves = 8
+domain_warp_type = 1
+domain_warp_fractal_type = 2
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_dn3f4"]
+in_3d_space = true
+seamless = true
+color_ramp = SubResource("Gradient_n0apb")
+noise = SubResource("FastNoiseLite_yhtrg")
+
+[sub_resource type="Gradient" id="Gradient_g8yvx"]
+offsets = PackedFloat32Array(0.112613, 0.536036, 1)
+colors = PackedColorArray(0, 0, 0, 1, 0.477157, 0.477157, 0.477157, 1, 1, 1, 1, 1)
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_58v4f"]
+noise_type = 2
+fractal_octaves = 8
+domain_warp_type = 1
+domain_warp_fractal_type = 2
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_trp8y"]
+in_3d_space = true
+seamless = true
+color_ramp = SubResource("Gradient_g8yvx")
+noise = SubResource("FastNoiseLite_58v4f")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_oavk5"]
+shader = SubResource("Shader_ijqbf")
+shader_parameter/clouds_samples = 32
+shader_parameter/shadow_sample = 4
+shader_parameter/clouds_density = 0.5
+shader_parameter/clouds_scale = 1.0
+shader_parameter/clouds_smoothness = 0.05
+shader_parameter/clouds_light_color = Color(0.227451, 0.52549, 1, 1)
+shader_parameter/clouds_shadow_intensity = 5.0
+shader_parameter/cloud_shape_sampler = SubResource("NoiseTexture2D_dn3f4")
+shader_parameter/cloud_noise_sampler = SubResource("NoiseTexture2D_nbupj")
+shader_parameter/cloud_curves = SubResource("CurveTexture_1gg2c")
+shader_parameter/high_clouds_density = 0.05
+shader_parameter/high_clouds_sampler = SubResource("NoiseTexture2D_trp8y")
+shader_parameter/top_color = Color(0.027451, 0.101961, 0.25098, 1)
+shader_parameter/bottom_color = Color(0.027451, 0.101961, 0.25098, 1)
+shader_parameter/sun_scatter = Color(0.12549, 0.0862745, 0.372549, 1)
+shader_parameter/astro_tint = Color(0.936954, 0.884666, 0.968659, 1)
+shader_parameter/astro_scale = 3.0
+shader_parameter/astro_intensity = 3.0
+shader_parameter/astro_sampler = SubResource("CompressedTexture2D_mmyjg")
+shader_parameter/stars_intensity = 3.0
+shader_parameter/shooting_stars_intensity = 0.1
+shader_parameter/shooting_star_tint = Color(1, 1, 1, 1)
+shader_parameter/shooting_star_sampler = ExtResource("1_wwrfa")
+
+[sub_resource type="Sky" id="Sky_as3rg"]
+sky_material = SubResource("ShaderMaterial_oavk5")
+
+[sub_resource type="Environment" id="Environment_rpfyx"]
+background_mode = 2
+background_energy_multiplier = 1.5
+sky = SubResource("Sky_as3rg")
+volumetric_fog_density = 10.0
+adjustment_enabled = true
+adjustment_saturation = 1.5
+
+[sub_resource type="Resource" id="Resource_o18ob"]
+script = ExtResource("4_qhhk0")
+mode = 0
+textures = [[ExtResource("5_fnrp3"), ExtResource("6_obd3b")], [ExtResource("7_abmex"), ExtResource("8_t5frk")]]
+
+[node name="Nigth" type="Node3D"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_rpfyx")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="WorldEnvironment"]
+transform = Transform3D(1, 0, 0, 0, 0.739678, 0.672961, 0, -0.672961, 0.739678, 0, 2.62658, 0)
+light_color = Color(2.11775e-06, 0.690668, 0.693964, 1)
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 151.006, 0)
+
+[node name="HTerrain" type="Node3D" parent="."]
+script = ExtResource("2_tgxne")
+map_scale = Vector3(5, 2.5, 5)
+centered = true
+_terrain_data = ExtResource("3_ffu16")
+chunk_size = 32
+collision_enabled = true
+collision_layer = 1
+collision_mask = 1
+shader_type = "Classic4Lite"
+custom_shader = null
+custom_globalmap_shader = null
+texture_set = SubResource("Resource_o18ob")
+render_layers = 1
+cast_shadow = 1
+shader_params/u_ground_uv_scale = 20
+shader_params/u_depth_blending = true
+shader_params/u_triplanar = null
+shader_params/u_tile_reduction = null
