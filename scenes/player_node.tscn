@@ -1,14 +1,20 @@
-[gd_scene load_steps=5 format=3 uid="uid://d2lxdbdtqjlh3"]
+[gd_scene load_steps=8 format=3 uid="uid://d2lxdbdtqjlh3"]
 
 [ext_resource type="Script" path="res://scripts/player_node.gd" id="1_nxd3g"]
+[ext_resource type="Script" path="res://scripts/camera.gd" id="2_tjje0"]
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_oxob8"]
-albedo_color = Color(0.854902, 0.0392157, 0.133333, 1)
+[sub_resource type="ImageTexture" id="ImageTexture_xuk5j"]
 
-[sub_resource type="CapsuleMesh" id="CapsuleMesh_cciqq"]
-material = SubResource("StandardMaterial3D_oxob8")
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_h2wug"]
+albedo_color = Color(0.933333, 0.129412, 0.0156863, 0.698039)
+albedo_texture = SubResource("ImageTexture_xuk5j")
 
-[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_pwf7m"]
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_jaqwy"]
+material = SubResource("StandardMaterial3D_h2wug")
+
+[sub_resource type="Skin" id="Skin_c44ir"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_20mqj"]
 
 [node name="Player" type="CharacterBody3D"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.99268, 0)
@@ -17,15 +23,14 @@ floor_stop_on_slope = false
 floor_block_on_wall = false
 script = ExtResource("1_nxd3g")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
-transform = Transform3D(15, 0, 0, 0, 15, 0, 0, 0, 15, 0, 13.5238, 0)
-mesh = SubResource("CapsuleMesh_cciqq")
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
-transform = Transform3D(15, 0, 0, 0, 15, 0, 0, 0, 15, 0, 12.8913, 0)
-shape = SubResource("CapsuleShape3D_pwf7m")
+[node name="mesh" type="MeshInstance3D" parent="."]
+transform = Transform3D(30, 0, 0, 0, 30, 0, 0, 0, 30, 0, 0, 0)
+mesh = SubResource("CapsuleMesh_jaqwy")
+skin = SubResource("Skin_c44ir")
 
 [node name="camera" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+script = ExtResource("2_tjje0")
 
 [node name="horizontal" type="Node3D" parent="camera"]
 
@@ -35,5 +40,8 @@ shape = SubResource("CapsuleShape3D_pwf7m")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 93.0465, 34.4023, 0)
 spring_length = 3.0
 
-[node name="Camera3D" type="Camera3D" parent="camera/horizontal/vertical/spring-arm"]
-transform = Transform3D(0.054985, 0, 0.998487, 0, 1, 0, -0.998487, 0, 0.054985, 0, 0, 0)
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(0.054985, 0, 0.998487, 0, 1, 0, -0.998487, 0, 0.054985, 93.0465, 35.9023, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("CapsuleShape3D_20mqj")
